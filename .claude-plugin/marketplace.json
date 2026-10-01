@@ -12,7 +12,7 @@
       "name": "leginova",
       "source": "./claude-plugin",
       "description": "Official law of New Caledonia (leginova.gouv.nc): search and read JONC, codes, consolidated texts, case law and Congress debates.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "category": "productivity"
     }
   ]

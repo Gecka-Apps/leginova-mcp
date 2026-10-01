@@ -80,7 +80,7 @@ Chaque [release](https://github.com/Gecka-Apps/leginova-mcp/releases) publie deu
 | `leginova.mcpb` | Extension Claude Desktop | [releases/latest/download/leginova.mcpb](https://github.com/Gecka-Apps/leginova-mcp/releases/latest/download/leginova.mcpb) |
 | `leginova-mcp.mjs` | Serveur en un seul fichier, pour Claude Code et les autres clients (Node.js 22 ou plus récent) | [releases/latest/download/leginova-mcp.mjs](https://github.com/Gecka-Apps/leginova-mcp/releases/latest/download/leginova-mcp.mjs) |
 
-Les mêmes fichiers existent sous un nom versionné (`leginova-0.1.0.mcpb`), avec leurs sommes `SHA256SUMS`.
+Les mêmes fichiers existent sous un nom versionné (`leginova-1.0.0.mcpb`), avec leurs sommes `SHA256SUMS`.
 
 ### Claude Desktop : extension MCPB (recommandé)
 

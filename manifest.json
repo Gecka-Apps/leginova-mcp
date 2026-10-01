@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "leginova",
   "display_name": "Leginova: droit de la Nouvelle-Calédonie",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Search and read the official law of New Caledonia on leginova.gouv.nc: JONC, codes, consolidated texts, case law and Congress debates.",
   "long_description": "Live access to leginova.gouv.nc, the official portal of New Caledonian law published by the Government of New Caledonia. Full-text and structured search, codes with prefix-tolerant article lookup (L. 441-6 resolves to Lp. 441-6 and says so), consolidated texts with their amendment history, court decisions and older JONC acts extracted from the official PDFs, Congress debates. Every result carries the official URL to cite. Read-only, no account needed.",
   "author": {
