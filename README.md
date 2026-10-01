@@ -80,7 +80,7 @@ Chaque [release](https://github.com/Gecka-Apps/leginova-mcp/releases) publie deu
 | `leginova.mcpb` | Extension Claude Desktop | [releases/latest/download/leginova.mcpb](https://github.com/Gecka-Apps/leginova-mcp/releases/latest/download/leginova.mcpb) |
 | `leginova-mcp.mjs` | Serveur en un seul fichier, pour Claude Code et les autres clients (Node.js 22 ou plus récent) | [releases/latest/download/leginova-mcp.mjs](https://github.com/Gecka-Apps/leginova-mcp/releases/latest/download/leginova-mcp.mjs) |
 
-Les mêmes fichiers existent sous un nom versionné (`leginova-1.0.0.mcpb`), avec leurs sommes `SHA256SUMS`.
+Les mêmes fichiers existent sous un nom versionné (`leginova-1.0.0.mcpb`). La release contient aussi `leginova-claude-plugin-<version>.zip`, l'archive du [plugin Claude Code](#claude-code--plugin), et les sommes `SHA256SUMS`.
 
 ### Claude Desktop : extension MCPB (recommandé)
 
@@ -125,20 +125,23 @@ claude mcp add --scope user leginova -- node /chemin/vers/leginova-mcp.mjs
 
 ### Claude Code : plugin
 
-Le dépôt est aussi une marketplace de plugins Claude Code. Le plugin embarque sa propre copie du serveur, placée dans `claude-plugin/server/` par `npm run build`. Depuis un clone où le build a été fait :
+Le dépôt est aussi une marketplace de plugins Claude Code (version 2.1.224 ou plus récente) :
 
 ```
-/plugin marketplace add /chemin/vers/le/clone
+/plugin marketplace add Gecka-Apps/leginova-mcp
 /plugin install leginova@leginova
 ```
 
-`/plugin marketplace add Gecka-Apps/leginova-mcp` fonctionnera directement depuis GitHub quand `claude-plugin/server/leginova-mcp.mjs` sera versionné dans le dépôt.
+Le plugin est téléchargé depuis la release, sous la forme de l'archive `leginova-claude-plugin-<version>.zip` qui contient le serveur, et son empreinte SHA-256 est vérifiée. Il lance le serveur avec le `node` du `PATH` (Node.js 22 ou plus récent). Pour recevoir les nouvelles versions, lancez `/plugin marketplace update leginova`, ou activez la mise à jour automatique de la marketplace dans `/plugin`, onglet **Marketplaces**.
+
+Pour tester le plugin depuis un clone : `npm run build` copie le serveur dans `claude-plugin/server/`, puis `claude --plugin-dir claude-plugin` le charge sans passer par la marketplace.
 
 ### claude.ai, Claude Desktop et mobile : connecteur distant
 
-Les connecteurs personnalisés sont appelés depuis l'infrastructure d'Anthropic : le serveur doit être joignable en HTTPS depuis Internet. Lancez-le en mode HTTP derrière un reverse proxy TLS :
+Les connecteurs personnalisés sont appelés depuis l'infrastructure d'Anthropic : le serveur doit être joignable en HTTPS depuis Internet. Lancez-le en mode HTTP derrière un reverse proxy TLS, par exemple avec le `Dockerfile` du dépôt :
 
 ```sh
+git clone https://github.com/Gecka-Apps/leginova-mcp.git && cd leginova-mcp
 docker build -t leginova-mcp .
 docker run -d --name leginova-mcp -p 127.0.0.1:3000:3000 \
   -e MCP_ALLOWED_HOSTS=leginova-mcp.example.nc \
@@ -154,11 +157,11 @@ Activez-le ensuite dans une conversation avec le bouton « + », puis **Connecto
 
 Les données servies sont publiques, le serveur ne demande donc pas d'authentification. Une instance exposée relaie toutefois les requêtes de ses utilisateurs vers leginova.gouv.nc : prévoyez une limitation de débit au niveau du proxy.
 
-Sans Docker : `node dist/leginova-mcp.mjs --http --host 0.0.0.0 --port 3000 --allowed-hosts leginova-mcp.example.nc`.
+Sans Docker, avec le [serveur en un fichier](#serveur-en-un-fichier) : `node /chemin/vers/leginova-mcp.mjs --http --host 0.0.0.0 --port 3000 --allowed-hosts leginova-mcp.example.nc`.
 
 ### Autres clients MCP
 
-Tout client qui lance un serveur stdio accepte la même configuration que Claude Desktop (`command: node`, `args: [".../dist/leginova-mcp.mjs"]`). Les clients qui parlent Streamable HTTP se connectent à l'URL `/mcp` d'une instance HTTP.
+Tout client qui lance un serveur stdio accepte la même configuration que Claude Desktop (`command: node`, `args: ["/chemin/vers/leginova-mcp.mjs"]`). Les clients qui parlent Streamable HTTP se connectent à l'URL `/mcp` d'une instance HTTP.
 
 ## Configuration
 
@@ -181,7 +184,7 @@ En mode HTTP, les en-têtes `Host` et `Origin` sont vérifiés pour bloquer le D
 ## Fonctionnement et limites
 
 - Leginova ne publie pas la documentation de son API. Les points d'accès utilisés sont ceux qu'appelle le site lui-même, relevés dans son client ; une évolution du site peut casser un outil. `npm run test:live` le détecte.
-- La jurisprudence, les débats du Congrès et beaucoup d'actes anciens du JONC (pour lesquels Leginova ne détient que les métadonnées) n'existent qu'en PDF. Leur texte est extrait page par page à la demande. Les plus anciens sont des scans sans couche texte : la réponse le dit (`pdf_without_text_layer`) et renvoie vers le PDF, aucun OCR n'est fait. Le premier accès à un débat télécharge jusqu'à 60 Mo, soit quelques secondes.
+- La jurisprudence, les débats du Congrès et beaucoup d'actes anciens du JONC (pour lesquels Leginova ne détient que les métadonnées) n'existent qu'en PDF. Leur texte est extrait page par page à la demande. La plupart des PDF anciens, même scannés, portent une couche texte ; quelques-uns n'en ont pas (des numéros du JONC de fin 1990, par exemple). La réponse le dit alors (`pdf_without_text_layer`) et renvoie vers le PDF : aucune reconnaissance de caractères n'est faite. Le premier accès à un débat télécharge jusqu'à 60 Mo, soit quelques secondes.
 - Les images incluses dans les textes (tableaux scannés, plans) sont remplacées par un repère : le document complet reste accessible par son URL ou son PDF.
 - Les textes consolidés sont la version en vigueur à leur date de consolidation, les codes à leur date d'application : les outils l'indiquent à chaque fois.
 - Le serveur reste poli avec le site : quatre requêtes simultanées au plus, cache, nouvelles tentatives espacées.
@@ -211,11 +214,11 @@ La CI GitHub teste sur Node.js 22, 24 et 26, puis construit l'extension à chaqu
 
 ### Publier une version
 
-1. `npm run version:set 0.2.0` aligne le numéro de version dans `package.json`, `package-lock.json`, `manifest.json`, `src/version.ts` et les manifestes du plugin ; `npm run version:check` le vérifie.
+1. `npm run version:set 0.2.0` aligne le numéro de version dans `package.json`, `package-lock.json`, `manifest.json`, `src/version.ts` et les manifestes du plugin, et fait pointer la marketplace sur l'archive du plugin de cette version ; `npm run version:check` le vérifie.
 2. Ajouter la section `## 0.2.0 (date)` à `CHANGELOG.md` : elle devient le texte de la release.
 3. Committer, puis pousser un tag annoté `v0.2.0`. Son message sert de titre à la release.
 
-Le workflow `release.yml` vérifie que le tag correspond partout au numéro de version, relance les tests (y compris contre leginova.gouv.nc), construit l'extension et publie la release avec `leginova-0.2.0.mcpb`, `leginova.mcpb`, `leginova-mcp-0.2.0.mjs`, `leginova-mcp.mjs` et `SHA256SUMS`. Un tag avec suffixe (`v0.2.0-rc.1`) donne une pré-version, qui ne remplace pas la cible des liens « latest ».
+Le workflow `release.yml` vérifie que le tag correspond partout au numéro de version, relance les tests (y compris contre leginova.gouv.nc), construit l'extension et publie la release avec `leginova-0.2.0.mcpb`, `leginova.mcpb`, `leginova-mcp-0.2.0.mjs`, `leginova-mcp.mjs`, `leginova-claude-plugin-0.2.0.zip` et `SHA256SUMS`. Il ajoute ensuite sur `main` un commit qui inscrit l'empreinte SHA-256 de l'archive du plugin dans la marketplace. Un tag avec suffixe (`v0.2.0-rc.1`) donne une pré-version, qui ne remplace pas la cible des liens « latest ».
 
 Le serveur repose sur le SDK MCP TypeScript v2 (`@modelcontextprotocol/server`, spécification 2026-07-28, compatible avec les clients 2025) et sur Zod 4. Les schémas d'entrée et de sortie des outils sont déclarés, et les réponses portent à la fois un texte Markdown et un `structuredContent`.
 
