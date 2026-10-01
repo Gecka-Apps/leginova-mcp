@@ -1,0 +1,19 @@
+{
+  "name": "leginova",
+  "owner": {
+    "name": "Gecka",
+    "email": "contact@gecka.nc"
+  },
+  "metadata": {
+    "description": "Claude Code plugin for leginova.gouv.nc, the official portal of New Caledonian law"
+  },
+  "plugins": [
+    {
+      "name": "leginova",
+      "source": "./claude-plugin",
+      "description": "Official law of New Caledonia (leginova.gouv.nc): search and read JONC, codes, consolidated texts, case law and Congress debates.",
+      "version": "0.1.0",
+      "category": "productivity"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.mcpb
+.mcpb-build/
+coverage/
+release/
+release-notes.md
+claude-plugin/server/
+!claude-plugin/.mcp.json

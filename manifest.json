@@ -1,0 +1,153 @@
+{
+  "manifest_version": "0.3",
+  "name": "leginova",
+  "display_name": "Leginova: droit de la Nouvelle-Calédonie",
+  "version": "0.1.0",
+  "description": "Search and read the official law of New Caledonia on leginova.gouv.nc: JONC, codes, consolidated texts, case law and Congress debates.",
+  "long_description": "Live access to leginova.gouv.nc, the official portal of New Caledonian law published by the Government of New Caledonia. Full-text and structured search, codes with prefix-tolerant article lookup (L. 441-6 resolves to Lp. 441-6 and says so), consolidated texts with their amendment history, court decisions and older JONC acts extracted from the official PDFs, Congress debates. Every result carries the official URL to cite. Read-only, no account needed.",
+  "author": {
+    "name": "Laurent Dinclaux",
+    "email": "laurent@gecka.nc",
+    "url": "https://gecka.nc"
+  },
+  "homepage": "https://leginova.gouv.nc",
+  "license": "AGPL-3.0-or-later",
+  "keywords": [
+    "droit",
+    "law",
+    "nouvelle-calédonie",
+    "new caledonia",
+    "jonc",
+    "jurisprudence",
+    "legal"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/leginova-mcp.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/leginova-mcp.mjs"
+      ],
+      "env": {
+        "LEGINOVA_CACHE_MB": "${user_config.cache_mb}",
+        "LEGINOVA_MAX_PDF_MB": "${user_config.max_pdf_mb}"
+      }
+    }
+  },
+  "user_config": {
+    "cache_mb": {
+      "type": "number",
+      "title": "Cache size (MB)",
+      "description": "Memory kept for documents already read (codes, PDFs).",
+      "default": 256,
+      "min": 16,
+      "max": 4096,
+      "required": false
+    },
+    "max_pdf_mb": {
+      "type": "number",
+      "title": "Largest PDF (MB)",
+      "description": "PDFs above this size are not downloaded. Congress debates reach 60 MB.",
+      "default": 80,
+      "min": 5,
+      "max": 500,
+      "required": false
+    }
+  },
+  "tools": [
+    {
+      "name": "leginova_search",
+      "description": "Full-text search across JONC, consolidated texts, codes, case law and debates"
+    },
+    {
+      "name": "leginova_advanced_search",
+      "description": "Structured search with keyword groups, boolean conditions and filters"
+    },
+    {
+      "name": "leginova_suggest",
+      "description": "Resolve a partial title to documents"
+    },
+    {
+      "name": "leginova_list_codes",
+      "description": "List the codes with their slugs, filing authority and version date"
+    },
+    {
+      "name": "leginova_get_code_outline",
+      "description": "Table of contents of a code"
+    },
+    {
+      "name": "leginova_get_code_article",
+      "description": "Read a code article, prefix-tolerant lookup by number"
+    },
+    {
+      "name": "leginova_read_code_section",
+      "description": "Full text of a code section"
+    },
+    {
+      "name": "leginova_get_texte_consolide",
+      "description": "Read a consolidated text and its amendment history"
+    },
+    {
+      "name": "leginova_get_jurisprudence",
+      "description": "Read a court decision"
+    },
+    {
+      "name": "leginova_get_jonc",
+      "description": "Open a Journal officiel issue"
+    },
+    {
+      "name": "leginova_get_jonc_item",
+      "description": "Read an act or publication from the JONC, with its JONC publication date"
+    },
+    {
+      "name": "leginova_get_debat",
+      "description": "Read a Congress debate"
+    },
+    {
+      "name": "leginova_browse",
+      "description": "Browse a collection by year"
+    },
+    {
+      "name": "leginova_get_catalogue",
+      "description": "Identifiers for advanced search filters"
+    }
+  ],
+  "prompts": [
+    {
+      "name": "legal_research",
+      "description": "Research a question of New Caledonian law",
+      "arguments": [
+        "question",
+        "as_of"
+      ],
+      "text": "Research this question of New Caledonian law using the Leginova tools: ${arguments.question}"
+    },
+    {
+      "name": "code_article_check",
+      "description": "Check a code article reference",
+      "arguments": [
+        "reference",
+        "code_slug"
+      ],
+      "text": "Check this reference against Leginova with leginova_get_code_article: ${arguments.reference}"
+    }
+  ],
+  "tools_generated": false,
+  "prompts_generated": true,
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=22.0.0"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gecka-Apps/leginova-mcp.git"
+  },
+  "support": "https://github.com/Gecka-Apps/leginova-mcp/issues"
+}

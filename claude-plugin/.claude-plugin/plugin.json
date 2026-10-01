@@ -1,0 +1,21 @@
+{
+  "name": "leginova",
+  "version": "0.1.0",
+  "description": "Official law of New Caledonia (leginova.gouv.nc) for Claude Code: JONC, codes with prefix-tolerant article lookup, consolidated texts, case law, Congress debates.",
+  "author": {
+    "name": "Laurent Dinclaux",
+    "email": "laurent@gecka.nc",
+    "url": "https://gecka.nc"
+  },
+  "homepage": "https://leginova.gouv.nc",
+  "license": "AGPL-3.0-or-later",
+  "keywords": [
+    "droit",
+    "law",
+    "nouvelle-caledonie",
+    "jonc",
+    "jurisprudence",
+    "mcp"
+  ],
+  "repository": "https://github.com/Gecka-Apps/leginova-mcp"
+}

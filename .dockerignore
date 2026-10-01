@@ -1,0 +1,6 @@
+node_modules
+dist
+claude-plugin/server
+*.mcpb
+.mcpb-build
+.git

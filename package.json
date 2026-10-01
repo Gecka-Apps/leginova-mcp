@@ -1,0 +1,69 @@
+{
+  "name": "leginova-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Leginova, the official portal of New Caledonian law: JONC, codes, consolidated texts, case law and Congress debates",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "leginova",
+    "nouvelle-caledonie",
+    "new-caledonia",
+    "droit",
+    "legal",
+    "jonc",
+    "jurisprudence"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "author": "Laurent Dinclaux <laurent@gecka.nc> (https://gecka.nc)",
+  "homepage": "https://github.com/Gecka-Apps/leginova-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gecka-Apps/leginova-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Gecka-Apps/leginova-mcp/issues"
+  },
+  "type": "module",
+  "bin": {
+    "leginova-mcp": "dist/leginova-mcp.mjs"
+  },
+  "files": [
+    "dist/leginova-mcp.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:live": "LEGINOVA_LIVE=1 vitest run test/live.test.ts",
+    "start": "node dist/leginova-mcp.mjs",
+    "start:http": "node dist/leginova-mcp.mjs --http",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/leginova-mcp.mjs",
+    "pack:mcpb": "npm run build && node scripts/pack-mcpb.mjs",
+    "check": "npm run typecheck && npm test && npm run build",
+    "version:check": "node scripts/version.mjs check",
+    "version:set": "node scripts/version.mjs set"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/node": "^2.1.0",
+    "@modelcontextprotocol/server": "^2.2.0",
+    "lru-cache": "^11.5.3",
+    "turndown": "^7.2.4",
+    "unpdf": "^1.8.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@anthropic-ai/mcpb": "^2.1.2",
+    "@modelcontextprotocol/client": "^2.2.0",
+    "@types/node": "^26.6.3",
+    "@types/turndown": "^5.0.6",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

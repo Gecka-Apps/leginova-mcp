@@ -1,0 +1,73 @@
+name: Release
+
+# Pushing a tag vX.Y.Z publishes a GitHub release with the Claude Desktop
+# extension. Each asset exists twice: versioned, and under a fixed name so that
+# https://github.com/<owner>/<repo>/releases/latest/download/leginova.mcpb
+# always serves the latest release.
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check the tag matches every version field
+        run: node scripts/version.mjs check "$GITHUB_REF_NAME"
+
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:live
+
+      - name: Build the extension
+        run: npm run pack:mcpb
+
+      - name: Collect release assets
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p release
+          cp "leginova-${version}.mcpb" release/
+          cp "leginova-${version}.mcpb" release/leginova.mcpb
+          cp dist/leginova-mcp.mjs "release/leginova-mcp-${version}.mjs"
+          cp dist/leginova-mcp.mjs release/leginova-mcp.mjs
+          (cd release && sha256sum * > SHA256SUMS)
+          node scripts/release-notes.mjs "$version" > release-notes.md
+          cat >> release-notes.md <<EOF
+
+          ### Install
+
+          - **Claude Desktop**: download \`leginova.mcpb\` and open it (double-click, or drag it onto the Claude Desktop window).
+          - **Claude Code**: download \`leginova-mcp.mjs\`, then \`claude mcp add --scope user leginova -- node /path/to/leginova-mcp.mjs\`.
+
+          Checksums are in \`SHA256SUMS\`.
+          EOF
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
+          title="$(git tag -l --format='%(contents:subject)' "$GITHUB_REF_NAME")"
+          [ -n "$title" ] || title="$GITHUB_REF_NAME"
+          flags=()
+          case "$GITHUB_REF_NAME" in *-*) flags+=(--prerelease) ;; *) flags+=(--latest) ;; esac
+          gh release create "$GITHUB_REF_NAME" release/* \
+            --verify-tag \
+            --title "$title" \
+            --notes-file release-notes.md \
+            "${flags[@]}"
