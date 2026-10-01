@@ -32,10 +32,12 @@ jobs:
 
       - run: npm run typecheck
       - run: npm test
-      - run: npm run test:live
 
       - name: Build the extension
         run: npm run pack:mcpb
+
+      - name: Live tests on the built server
+        run: npm run test:live
 
       - name: Collect release assets
         run: |
