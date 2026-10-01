@@ -1,9 +1,11 @@
 name: Release
 
 # Pushing a tag vX.Y.Z publishes a GitHub release with the Claude Desktop
-# extension. Each asset exists twice: versioned, and under a fixed name so that
+# extension, the single-file server and the Claude Code plugin archive. The
+# extension and the server also exist under a fixed name, so that
 # https://github.com/<owner>/<repo>/releases/latest/download/leginova.mcpb
-# always serves the latest release.
+# always serves the latest release. The plugin archive is versioned only: the
+# marketplace points at it and pins its digest once it is published.
 
 on:
   push:
@@ -47,6 +49,7 @@ jobs:
           cp "leginova-${version}.mcpb" release/leginova.mcpb
           cp dist/leginova-mcp.mjs "release/leginova-mcp-${version}.mjs"
           cp dist/leginova-mcp.mjs release/leginova-mcp.mjs
+          (cd claude-plugin && zip -q -X -r "../release/leginova-claude-plugin-${version}.zip" .claude-plugin .mcp.json server)
           (cd release && sha256sum * > SHA256SUMS)
           node scripts/release-notes.mjs "$version" > release-notes.md
           cat >> release-notes.md <<EOF
@@ -55,6 +58,7 @@ jobs:
 
           - **Claude Desktop**: download \`leginova.mcpb\` and open it (double-click, or drag it onto the Claude Desktop window).
           - **Claude Code**: download \`leginova-mcp.mjs\`, then \`claude mcp add --scope user leginova -- node /path/to/leginova-mcp.mjs\`.
+          - **Claude Code plugin**: \`/plugin marketplace add Gecka-Apps/leginova-mcp\`, then \`/plugin install leginova@leginova\`.
 
           Checksums are in \`SHA256SUMS\`.
           EOF
@@ -73,3 +77,16 @@ jobs:
             --title "$title" \
             --notes-file release-notes.md \
             "${flags[@]}"
+
+      - name: Pin the plugin archive in the marketplace
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          digest="$(sha256sum "release/leginova-claude-plugin-${version}.zip" | cut -d' ' -f1)"
+          git fetch origin main
+          git checkout -B main origin/main
+          node scripts/version.mjs pin "$version" "$digest"
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -am "chore(plugin): pin the v${version} plugin archive"
+          git push origin main
