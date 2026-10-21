@@ -7,3 +7,4 @@ release/
 release-notes.md
 claude-plugin/server/
 !claude-plugin/.mcp.json
+.env

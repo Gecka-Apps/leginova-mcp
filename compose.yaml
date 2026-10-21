@@ -1,0 +1,13 @@
+# Streamable HTTP deployment, configured from .env (see .env.example).
+
+services:
+  leginova-mcp:
+    build: .
+    image: leginova-mcp
+    container_name: ${LEGINOVA_CONTAINER_NAME:-leginova-mcp}
+    restart: unless-stopped
+    ports:
+      - "${LEGINOVA_BIND:-127.0.0.1}:${LEGINOVA_PORT:-3000}:3000"
+    environment:
+      MCP_ALLOWED_HOSTS: ${MCP_ALLOWED_HOSTS:?set MCP_ALLOWED_HOSTS in .env}
+      MCP_ALLOWED_ORIGINS: ${MCP_ALLOWED_ORIGINS:-}

@@ -3,6 +3,7 @@
 ## Unreleased
 
 - The Claude Code plugin installs straight from GitHub (`/plugin marketplace add Gecka-Apps/leginova-mcp`): releases publish it as `leginova-claude-plugin-<version>.zip`, and the marketplace points at that archive and pins its SHA-256 digest. The 1.0.0 archive was added to the existing release.
+- `compose.yaml` for the HTTP deployment, configured from `.env` (container name, published address and port, allowed hosts and origins). `.env.example` documents the variables.
 - README: corrected the paths of the single-file server, the Docker build from a clone, and the description of PDFs without a text layer.
 
 ## 1.0.0 (2026-10-01)

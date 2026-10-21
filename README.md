@@ -138,12 +138,23 @@ Pour tester le plugin depuis un clone : `npm run build` copie le serveur dans `c
 
 ### claude.ai, Claude Desktop et mobile : connecteur distant
 
-Les connecteurs personnalisés sont appelés depuis l'infrastructure d'Anthropic : le serveur doit être joignable en HTTPS depuis Internet. Lancez-le en mode HTTP derrière un reverse proxy TLS, par exemple avec le `Dockerfile` du dépôt :
+Les connecteurs personnalisés sont appelés depuis l'infrastructure d'Anthropic : le serveur doit être joignable en HTTPS depuis Internet. Lancez-le en mode HTTP derrière un reverse proxy TLS, par exemple avec le `compose.yaml` du dépôt :
 
 ```sh
 git clone https://github.com/Gecka-Apps/leginova-mcp.git && cd leginova-mcp
+cp .env.example .env    # puis renseignez MCP_ALLOWED_HOSTS
+docker compose up -d --build
+```
+
+Le `.env` fixe le nom du conteneur (`LEGINOVA_CONTAINER_NAME`, par défaut `leginova-mcp`), l'adresse et le port publiés sur l'hôte (`LEGINOVA_BIND`, `LEGINOVA_PORT`, par défaut `127.0.0.1` et `3000`) et les noms d'hôte acceptés. Le serveur écoute toujours sur le port 3000 dans le conteneur : on change le port public avec `LEGINOVA_PORT`, pas avec `PORT`. Après une modification du `.env`, `docker compose up -d` recrée le conteneur.
+
+Si vos clients se connectent directement à l'adresse publiée, sans passer par un proxy, ajoutez-la à `MCP_ALLOWED_HOSTS` (`leginova-mcp.example.nc,10.0.0.5`). La vérification du `Host` ne tient pas compte du port.
+
+Sans Compose, avec le `Dockerfile` seul :
+
+```sh
 docker build -t leginova-mcp .
-docker run -d --name leginova-mcp -p 127.0.0.1:3000:3000 \
+docker run -d --name leginova-mcp --restart unless-stopped -p 127.0.0.1:3000:3000 \
   -e MCP_ALLOWED_HOSTS=leginova-mcp.example.nc \
   leginova-mcp
 ```
